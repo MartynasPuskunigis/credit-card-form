@@ -1,4 +1,4 @@
-export interface FormDto {
+export interface CreditCardFormDto {
     creditCardNumberValue: string;
     expirationDateValue: string;
     cvvValue: string;

@@ -1,14 +1,16 @@
 import * as React from "react";
-import { Container } from "flux/utils";
 
-import { FormStore } from "../stores/form-store";
 import { FormActionsCreators } from "../actions/actions-creators";
 import { FormHelpers } from "../helpers/form-helpers";
+import { FormNormalizers } from "../normalizers/form-normalizers";
+import { NormalizeOptions } from "../normalizers/normalize-options";
 
 export interface InputValidator {
     isOverMaxLength: boolean;
     isBelowMinLength: boolean;
-    isOnlyNumbers?: boolean;
+    isValidZipCode: boolean;
+    isValidCreditCardNumber: boolean;
+    isValidExpirationDate: boolean;
 }
 
 interface Props {
@@ -19,61 +21,80 @@ interface Props {
     onlyNumbers?: boolean;
     placeholder?: string;
     onChange?: (event: React.ChangeEvent<HTMLInputElement>, validator: InputValidator) => void;
+    creditCardNormalizer?: " " | "-";
+    normalizeExpirationDate?: true;
+    normalizePostalCode?: true;
 }
 
 interface State {
     value: string;
 }
 
-export class InputContainerClass extends React.Component<Props, State> {
-    public static getStores(): Container.StoresList {
-        return [FormStore];
-    }
+export class Input extends React.Component<Props, State> {
+    public state: State = {
+        value: ""
+    };
 
-    public static calculateState(state: State, props: Props): State {
-        const { zipCodeValue, cvvValue, expirationDateValue, creditCardNumberValue } = FormStore.getState();
+    private normalizeOptions: NormalizeOptions = {
+        creditCardNormalize: this.props.creditCardNormalizer,
+        expirationDateNormalize: this.props.normalizeExpirationDate,
+        postalCodeNormalize: this.props.normalizePostalCode
+    };
 
-        switch (props.inputId) {
-            case "CREDIT_CARD_NUMBER": {
-                return {
-                    value: creditCardNumberValue
-                };
-            }
+    // public static getStores(): Container.StoresList {
+    //     return [FormStore];
+    // }
 
-            case "EXPIRATION_DATE": {
-                return {
-                    value: expirationDateValue
-                };
-            }
+    // public static calculateState(state: State, props: Props): State {
+    //     const { zipCodeValue, cvvValue, expirationDateValue, creditCardNumberValue } = FormStore.getState();
 
-            case "CVV": {
-                return {
-                    value: cvvValue
-                };
-            }
+    //     switch (props.inputId) {
+    //         case "CREDIT_CARD_NUMBER": {
+    //             return {
+    //                 value: creditCardNumberValue
+    //             };
+    //         }
 
-            case "ZIP_CODE": {
-                return {
-                    value: zipCodeValue
-                };
-            }
+    //         case "EXPIRATION_DATE": {
+    //             return {
+    //                 value: expirationDateValue
+    //             };
+    //         }
 
-            default: {
-                return { value: "" };
-            }
-        }
-    }
+    //         case "CVV": {
+    //             return {
+    //                 value: cvvValue
+    //             };
+    //         }
+
+    //         case "ZIP_CODE": {
+    //             return {
+    //                 value: zipCodeValue
+    //             };
+    //         }
+
+    //         default: {
+    //             return { value: "" };
+    //         }
+    //     }
+    // }
 
     private getValidator(newValue: string): InputValidator {
         return {
             isBelowMinLength: this.props.minLength != null ? !FormHelpers.isMinLength(newValue, this.props.minLength) : true,
             isOverMaxLength: this.props.maxLength != null ? !FormHelpers.isMaxLength(newValue, this.props.maxLength) : true,
-            isOnlyNumbers: this.props.onlyNumbers != null ? FormHelpers.isOnlyNumbers(newValue) : undefined
+            isValidZipCode: FormHelpers.isValidZipCode(newValue),
+            isValidCreditCardNumber: FormHelpers.isValidCreditCardNumber(newValue),
+            isValidExpirationDate: FormHelpers.isValidExpirationDate(newValue)
         };
     }
 
     private onInputValueChange: React.ChangeEventHandler<HTMLInputElement> = event => {
-        const newValue = event.target.value;
+        let newValue = event.target.value;
+        if (this.props.creditCardNormalizer != null) {
+            newValue = event.target.value.replace(/\s+/g, "");
+        }
+
         const validator = this.getValidator(newValue);
 
         if (this.props.onChange != null) {
@@ -81,6 +102,14 @@ export class InputContainerClass extends React.Component<Props, State> {
         }
 
         FormActionsCreators.changeInputValue(this.props.inputId, newValue);
+
+        this.setState({ value: FormNormalizers.normalizeValue(newValue, this.normalizeOptions) });
+        // if (this.props.creditCardNormalizer != null) {
+        //     const normalizedValue = FormNormalizers.normalizeCreditCardNumber(newValue, " ");
+        //     this.setState({ value: normalizedValue });
+        // } else {
+        //     this.setState({ value: newValue });
+        // }
     };
 
     public render(): JSX.Element {
@@ -91,8 +120,7 @@ export class InputContainerClass extends React.Component<Props, State> {
                 onChange={this.onInputValueChange}
                 placeholder={this.props.placeholder}
                 name={this.props.inputId}
-                // ref={this.SetElementRef}
-                // disabled={this.Disabled}
+                maxLength={this.props.maxLength}
                 // onFocus={this.OnFocus}
                 // onBlur={this.OnBlur}
             />
@@ -100,4 +128,4 @@ export class InputContainerClass extends React.Component<Props, State> {
     }
 }
 
-export const Input = Container.create(InputContainerClass, { withProps: true });
+// export const Input = Container.create(InputContainerClass, { withProps: true });
