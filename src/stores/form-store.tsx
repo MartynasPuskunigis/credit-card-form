@@ -1,12 +1,10 @@
 import { ReduceStore } from "simplr-flux";
 
-import { FormDto } from "../shared/contracts/form-dto";
-import { InputErrorDto } from "../shared/contracts/input-error-dto";
+import { CreditCardFormDto } from "../shared/contracts/form-dto";
 import { InputChangeAction } from "../actions/actions";
 
-interface StoreState extends FormDto {
+interface StoreState extends CreditCardFormDto {
     disabled: boolean;
-    errors: InputErrorDto[];
 }
 
 class FormReduceStoreClass extends ReduceStore<StoreState> {
@@ -21,12 +19,11 @@ class FormReduceStoreClass extends ReduceStore<StoreState> {
             cvvValue: "",
             expirationDateValue: "",
             zipCodeValue: "",
-            disabled: false,
-            errors: []
+            disabled: false
         };
     }
 
-    public toObject(): FormDto {
+    public toObject(): CreditCardFormDto {
         const state = this.getState();
 
         return {

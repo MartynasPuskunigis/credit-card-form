@@ -1,5 +1,7 @@
 @import "reset.scss";
 
+@include reset-css;
+
 html,
 body,
 .app-root,
@@ -8,7 +10,7 @@ body,
     background: #f2f2f2;
     display: flex;
     justify-content: center;
-    
+
     input:focus {
         outline: none;
     }

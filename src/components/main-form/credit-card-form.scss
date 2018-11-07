@@ -9,6 +9,7 @@
     .form {
         background: #fff;
         padding: 1rem 5rem;
+        height: 27rem;
 
         .input-fields {
             .row {
@@ -37,6 +38,12 @@
                             border-bottom: 1px #3f51b5 solid;
                         }
                     }
+
+                    .incorrect-input-warning {
+                        font-size: 0.9rem;
+                        padding-top: 0.6rem;
+                        color: red;
+                    }
                 }
             }
         }
@@ -52,6 +59,23 @@
                 padding: 1rem 3rem;
                 text-transform: uppercase;
                 font-size: 1.05rem;
+            }
+        }
+
+        .error-list {
+            .error {
+                color: red;
+                display: flex;
+                align-items: center;
+                padding: 1rem 0;
+
+                .error-icon {
+                    padding-right: 1rem;
+                }
+
+                .error-message {
+                    font-size: 0.8rem;
+                }
             }
         }
     }
