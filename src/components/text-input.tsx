@@ -41,44 +41,6 @@ export class Input extends React.Component<Props, State> {
         postalCodeNormalize: this.props.normalizePostalCode
     };
 
-    // public static getStores(): Container.StoresList {
-    //     return [FormStore];
-    // }
-
-    // public static calculateState(state: State, props: Props): State {
-    //     const { zipCodeValue, cvvValue, expirationDateValue, creditCardNumberValue } = FormStore.getState();
-
-    //     switch (props.inputId) {
-    //         case "CREDIT_CARD_NUMBER": {
-    //             return {
-    //                 value: creditCardNumberValue
-    //             };
-    //         }
-
-    //         case "EXPIRATION_DATE": {
-    //             return {
-    //                 value: expirationDateValue
-    //             };
-    //         }
-
-    //         case "CVV": {
-    //             return {
-    //                 value: cvvValue
-    //             };
-    //         }
-
-    //         case "ZIP_CODE": {
-    //             return {
-    //                 value: zipCodeValue
-    //             };
-    //         }
-
-    //         default: {
-    //             return { value: "" };
-    //         }
-    //     }
-    // }
-
     private getValidator(newValue: string): InputValidator {
         return {
             isBelowMinLength: this.props.minLength != null ? !FormHelpers.isMinLength(newValue, this.props.minLength) : true,
@@ -104,12 +66,6 @@ export class Input extends React.Component<Props, State> {
         FormActionsCreators.changeInputValue(this.props.inputId, newValue);
 
         this.setState({ value: FormNormalizers.normalizeValue(newValue, this.normalizeOptions) });
-        // if (this.props.creditCardNormalizer != null) {
-        //     const normalizedValue = FormNormalizers.normalizeCreditCardNumber(newValue, " ");
-        //     this.setState({ value: normalizedValue });
-        // } else {
-        //     this.setState({ value: newValue });
-        // }
     };
 
     public render(): JSX.Element {
@@ -127,5 +83,3 @@ export class Input extends React.Component<Props, State> {
         );
     }
 }
-
-// export const Input = Container.create(InputContainerClass, { withProps: true });

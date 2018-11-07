@@ -30,9 +30,7 @@ export class CreditCardForm extends React.Component<{}, State> {
     };
 
     private onCreditCardSubmit = (event: React.MouseEvent<HTMLFormElement>, formObject: CreditCardFormDto) => {
-        // if (this.state.creditCardNumberValid === false && this.state.expirationDateInputTooShort === false) {
-        //     console.info(formObject);
-        // }
+        console.info(formObject);
     };
 
     private onCreditCardNumberInputChange = (event: React.ChangeEvent<HTMLInputElement>, validator: InputValidator) => {

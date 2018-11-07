@@ -17,13 +17,6 @@ export namespace FormHelpers {
 
     export function isOnlyNumbers(value: string): boolean {
         const digitRegex = new RegExp("^[0-9]*$");
-        // const valueReplacedWithRegex = value.replace(digitRegex, "");
-
-        // if (valueReplacedWithRegex.length === 0) {
-        //     return true;
-        // } else {
-        //     return false;
-        // }
 
         if (digitRegex.test(value)) {
             return true;
