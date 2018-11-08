@@ -1,82 +1,115 @@
 import * as React from "react";
 
-import { Form } from "../form";
-import { Input, InputValidator } from "../text-input";
-import { CreditCardFormDto } from "../../shared/contracts/form-dto";
+import { Input } from "../text-input";
+import { FormHelpers } from "../../helpers/form-helpers";
+import { Dictionary } from "../../shared/contracts/dictionary";
+import { FormValidators } from "../../validators/form-validators";
+import { CreditCardFormDto } from "../../shared/contracts/credit-card-form-dto";
 
 import "./credit-card-form.scss";
 
+export const CREDIT_CARD_NUMBER_INPUT_NAME = "CREDIT_CARD_NUMBER";
+export const EXPIRATION_DATE_INPUT_NAME = "EXPIRATION_DATE";
+export const CVV_INPUT_NAME = "CVV";
+export const ZIP_CODE_INPUT_NAME = "ZIP_CODE";
+
 interface State {
-    isCreditCardNumberValid: boolean;
-    isExpirationDateValid: boolean;
-    isCvvValid: boolean;
-    isZipCodeValid: boolean;
-    creditCardNumberInputValue: string;
-    expirationDateInputValue: string;
-    cvvInputValue: string;
-    zipCodeInputValue: string;
+    creditCardNumberValue: string;
+    expirationDateValue: string;
+    cvvValue: string;
+    zipCodeValue: string;
+    fieldValidationStatus: Dictionary<boolean>;
+    showErrorList: boolean;
 }
 
 export class CreditCardForm extends React.Component<{}, State> {
     public state: State = {
-        isCreditCardNumberValid: false,
-        isExpirationDateValid: false,
-        isZipCodeValid: false,
-        isCvvValid: false,
-        creditCardNumberInputValue: "",
-        cvvInputValue: "",
-        expirationDateInputValue: "",
-        zipCodeInputValue: ""
+        fieldValidationStatus: {},
+        creditCardNumberValue: "",
+        cvvValue: "",
+        expirationDateValue: "",
+        zipCodeValue: "",
+        showErrorList: false
     };
 
-    private onCreditCardSubmit = (event: React.MouseEvent<HTMLFormElement>, formObject: CreditCardFormDto) => {
-        console.info(formObject);
+    private onCreditCardSubmit = (event: React.MouseEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const creditCardFormObject: CreditCardFormDto = {
+            creditCardNumberValue: this.state.creditCardNumberValue,
+            cvvValue: this.state.cvvValue,
+            expirationDateValue: this.state.expirationDateValue,
+            zipCodeValue: this.state.zipCodeValue
+        };
+
+        if (FormHelpers.areAllInputFieldsCorrect(this.state.fieldValidationStatus, creditCardFormObject)) {
+            console.info("Credit card info submitted:", creditCardFormObject);
+        } else {
+            this.setState({
+                showErrorList: true,
+                fieldValidationStatus: this.setUncheckedFieldsAsInvalid()
+            });
+        }
     };
 
-    private onCreditCardNumberInputChange = (event: React.ChangeEvent<HTMLInputElement>, validator: InputValidator) => {
-        this.setState({
-            isCreditCardNumberValid: validator.isValidCreditCardNumber,
-            creditCardNumberInputValue: event.target.value
-        });
+    private setUncheckedFieldsAsInvalid(): Dictionary<boolean> {
+        const newFieldValidationStatus = { ...this.state.fieldValidationStatus };
+        const allFieldNames = [CREDIT_CARD_NUMBER_INPUT_NAME, EXPIRATION_DATE_INPUT_NAME, CVV_INPUT_NAME, ZIP_CODE_INPUT_NAME];
+
+        for (const key of allFieldNames) {
+            if (!newFieldValidationStatus.hasOwnProperty(key)) {
+                newFieldValidationStatus[key] = false;
+            }
+        }
+
+        return newFieldValidationStatus;
+    }
+
+    private onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const isValid = FormValidators.isInputValid(event.target);
+        const newValidationDictionary = this.state.fieldValidationStatus;
+        newValidationDictionary[event.target.name] = isValid;
+
+        const newState: State = {
+            creditCardNumberValue:
+                event.target.name === CREDIT_CARD_NUMBER_INPUT_NAME ? event.target.value : this.state.creditCardNumberValue,
+            expirationDateValue: event.target.name === EXPIRATION_DATE_INPUT_NAME ? event.target.value : this.state.expirationDateValue,
+            cvvValue: event.target.name === CVV_INPUT_NAME ? event.target.value : this.state.cvvValue,
+            zipCodeValue: event.target.name === ZIP_CODE_INPUT_NAME ? event.target.value : this.state.zipCodeValue,
+            fieldValidationStatus: newValidationDictionary,
+            showErrorList: true
+        };
+
+        this.setState(newState);
     };
 
-    private onExpirationDateInputChange = (event: React.ChangeEvent<HTMLInputElement>, validator: InputValidator) => {
-        this.setState({
-            isExpirationDateValid: validator.isValidExpirationDate,
-            expirationDateInputValue: event.target.value
-        });
-    };
-
-    private onZipCodeInputChange = (event: React.ChangeEvent<HTMLInputElement>, validator: InputValidator) => {
-        this.setState({
-            isZipCodeValid: validator.isValidZipCode,
-            zipCodeInputValue: event.target.value
-        });
-    };
-
-    private onCvvInputChange = (event: React.ChangeEvent<HTMLInputElement>, validator: InputValidator) => {
-        this.setState({
-            isCvvValid: !validator.isBelowMinLength && !validator.isOverMaxLength,
-            cvvInputValue: event.target.value
-        });
-    };
-
-    private renderErrorMessage(errorMessage: string): JSX.Element {
+    private renderErrorMessage(inputName: string, errorMessage: string): JSX.Element | null {
         const incorrectInputIcon = <div className="fas fa-exclamation-triangle error-icon" />;
-
-        return (
-            <div className="error">
-                {incorrectInputIcon}
-                <div className="error-message">{errorMessage}</div>
-            </div>
-        );
+        if (!this.state.fieldValidationStatus[inputName] && this.state.fieldValidationStatus[inputName] != null) {
+            return (
+                <div className="error">
+                    {incorrectInputIcon}
+                    <div className="error-message">{errorMessage}</div>
+                </div>
+            );
+        } else {
+            return null;
+        }
     }
 
     public render(): JSX.Element {
+        const errorList = (
+            <div className="error-list">
+                {this.renderErrorMessage(CREDIT_CARD_NUMBER_INPUT_NAME, "Credit card number is not valid!")}
+                {this.renderErrorMessage(EXPIRATION_DATE_INPUT_NAME, "Expiration date is not valid!")}
+                {this.renderErrorMessage(CVV_INPUT_NAME, "CVV is not valid!")}
+                {this.renderErrorMessage(ZIP_CODE_INPUT_NAME, "Zip code is not valid!")}
+            </div>
+        );
+
         return (
             <div className="credit-card-form">
                 <div className="header">Card payment</div>
-                <Form className="form" onSubmit={this.onCreditCardSubmit}>
+                <form className="form" onSubmit={this.onCreditCardSubmit}>
                     <div className="input-fields">
                         <div className="row">
                             <div className="input-field">
@@ -86,9 +119,9 @@ export class CreditCardForm extends React.Component<{}, State> {
                                 </div>
                                 <Input
                                     className="form-input"
-                                    inputId="CREDIT_CARD_NUMBER"
+                                    name={CREDIT_CARD_NUMBER_INPUT_NAME}
                                     placeholder="1111 1111 1111 1111"
-                                    onChange={this.onCreditCardNumberInputChange}
+                                    onChange={this.onInputChange}
                                     creditCardNormalizer=" "
                                     maxLength={20}
                                 />
@@ -100,10 +133,10 @@ export class CreditCardForm extends React.Component<{}, State> {
                                 </div>
                                 <Input
                                     className="form-input"
-                                    inputId="EXPIRATION_DATE"
+                                    name={EXPIRATION_DATE_INPUT_NAME}
                                     placeholder="MM/YY"
                                     maxLength={5}
-                                    onChange={this.onExpirationDateInputChange}
+                                    onChange={this.onInputChange}
                                     normalizeExpirationDate
                                 />
                             </div>
@@ -116,11 +149,11 @@ export class CreditCardForm extends React.Component<{}, State> {
                                 </div>
                                 <Input
                                     className="form-input"
-                                    inputId="CVV"
+                                    name={CVV_INPUT_NAME}
                                     placeholder="111"
-                                    minLength={3}
                                     maxLength={4}
-                                    onChange={this.onCvvInputChange}
+                                    minLength={3}
+                                    onChange={this.onInputChange}
                                 />
                             </div>
                             <div className="input-field">
@@ -130,10 +163,10 @@ export class CreditCardForm extends React.Component<{}, State> {
                                 </div>
                                 <Input
                                     className="form-input"
-                                    inputId="ZIP_CODE"
+                                    name={ZIP_CODE_INPUT_NAME}
                                     placeholder="11111"
                                     maxLength={10}
-                                    onChange={this.onZipCodeInputChange}
+                                    onChange={this.onInputChange}
                                     normalizePostalCode
                                 />
                             </div>
@@ -142,21 +175,8 @@ export class CreditCardForm extends React.Component<{}, State> {
                     <div className="buttons">
                         <input type="submit" value="Pay" />
                     </div>
-                    <div className="error-list">
-                        {!this.state.isCreditCardNumberValid && this.state.creditCardNumberInputValue.length !== 0
-                            ? this.renderErrorMessage("Credit card number is not valid!")
-                            : null}
-                        {!this.state.isExpirationDateValid && this.state.expirationDateInputValue.length !== 0
-                            ? this.renderErrorMessage("Expiration date is not valid!")
-                            : null}
-                        {!this.state.isCvvValid && this.state.cvvInputValue.length !== 0
-                            ? this.renderErrorMessage("CVV is not valid!")
-                            : null}
-                        {!this.state.isZipCodeValid && this.state.zipCodeInputValue.length !== 0
-                            ? this.renderErrorMessage("Zip code is not valid!")
-                            : null}
-                    </div>
-                </Form>
+                    {this.state.showErrorList ? errorList : null}
+                </form>
             </div>
         );
     }

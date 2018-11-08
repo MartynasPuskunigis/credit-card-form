@@ -1,7 +1,5 @@
 import * as React from "react";
 
-import { FormActionsCreators } from "../actions/actions-creators";
-import { FormHelpers } from "../helpers/form-helpers";
 import { FormNormalizers } from "../normalizers/form-normalizers";
 import { NormalizeOptions } from "../normalizers/normalize-options";
 
@@ -14,13 +12,14 @@ export interface InputValidator {
 }
 
 interface Props {
-    inputId: string;
-    className: string;
+    name: string;
+    className?: string;
     minLength?: number;
     maxLength?: number;
     onlyNumbers?: boolean;
     placeholder?: string;
-    onChange?: (event: React.ChangeEvent<HTMLInputElement>, validator: InputValidator) => void;
+    defaultValue?: string;
+    onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
     creditCardNormalizer?: " " | "-";
     normalizeExpirationDate?: true;
     normalizePostalCode?: true;
@@ -31,9 +30,10 @@ interface State {
 }
 
 export class Input extends React.Component<Props, State> {
-    public state: State = {
-        value: ""
-    };
+    constructor(props: Props) {
+        super(props);
+        this.state = { value: props.defaultValue != null ? props.defaultValue : "" };
+    }
 
     private normalizeOptions: NormalizeOptions = {
         creditCardNormalize: this.props.creditCardNormalizer,
@@ -41,29 +41,12 @@ export class Input extends React.Component<Props, State> {
         postalCodeNormalize: this.props.normalizePostalCode
     };
 
-    private getValidator(newValue: string): InputValidator {
-        return {
-            isBelowMinLength: this.props.minLength != null ? !FormHelpers.isMinLength(newValue, this.props.minLength) : true,
-            isOverMaxLength: this.props.maxLength != null ? !FormHelpers.isMaxLength(newValue, this.props.maxLength) : true,
-            isValidZipCode: FormHelpers.isValidZipCode(newValue),
-            isValidCreditCardNumber: FormHelpers.isValidCreditCardNumber(newValue),
-            isValidExpirationDate: FormHelpers.isValidExpirationDate(newValue)
-        };
-    }
-
     private onInputValueChange: React.ChangeEventHandler<HTMLInputElement> = event => {
-        let newValue = event.target.value;
-        if (this.props.creditCardNormalizer != null) {
-            newValue = event.target.value.replace(/\s+/g, "");
-        }
-
-        const validator = this.getValidator(newValue);
+        const newValue = event.target.value;
 
         if (this.props.onChange != null) {
-            this.props.onChange(event, validator);
+            this.props.onChange(event);
         }
-
-        FormActionsCreators.changeInputValue(this.props.inputId, newValue);
 
         this.setState({ value: FormNormalizers.normalizeValue(newValue, this.normalizeOptions) });
     };
@@ -75,8 +58,9 @@ export class Input extends React.Component<Props, State> {
                 value={this.state.value}
                 onChange={this.onInputValueChange}
                 placeholder={this.props.placeholder}
-                name={this.props.inputId}
+                name={this.props.name}
                 maxLength={this.props.maxLength}
+                minLength={this.props.minLength}
                 // onFocus={this.OnFocus}
                 // onBlur={this.OnBlur}
             />

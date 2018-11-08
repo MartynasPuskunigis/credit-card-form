@@ -14,17 +14,18 @@ export namespace FormNormalizers {
     }
 
     export function normalizeCreditCardNumber(value: string, separator: " " | "-"): string {
-        let newValue = "";
-
-        for (let index = 0; index < value.length; index = index + 4) {
-            if (index + 4 < value.length) {
-                newValue = `${newValue} ${value.substring(index, index + 4)}`;
-            } else {
-                newValue = `${newValue} ${value.substring(index)}`;
-            }
+        const cleanValue = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
+        const matches = cleanValue.match(/\d{4,16}/g);
+        const match = (matches && matches[0]) || "";
+        const parts = [];
+        for (let i = 0, length = match.length; i < length; i += 4) {
+            parts.push(match.substring(i, i + 4));
         }
-
-        return newValue;
+        if (parts.length) {
+            return parts.join(" ");
+        } else {
+            return value;
+        }
     }
 
     export function normalizeExpirationDate(value: string): string {
