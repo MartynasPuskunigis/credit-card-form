@@ -34,6 +34,12 @@
                         border: none;
                         border-bottom: 1px #dbd9d9 solid;
 
+                        &::-webkit-inner-spin-button,
+                        &::-webkit-outer-spin-button {
+                            -webkit-appearance: none;
+                            margin: 0;
+                        }
+
                         &:focus {
                             border-bottom: 1px #3f51b5 solid;
                         }

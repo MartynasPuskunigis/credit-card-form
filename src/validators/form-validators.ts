@@ -1,35 +1,4 @@
-import {
-    CREDIT_CARD_NUMBER_INPUT_NAME,
-    EXPIRATION_DATE_INPUT_NAME,
-    CVV_INPUT_NAME,
-    ZIP_CODE_INPUT_NAME
-} from "../components/main-form/credit-card-form";
-
 export namespace FormValidators {
-    export function isInputValid(input: EventTarget & HTMLInputElement): boolean {
-        switch (input.name) {
-            case CREDIT_CARD_NUMBER_INPUT_NAME: {
-                return isCreditCardNumberValid(input.value);
-            }
-
-            case EXPIRATION_DATE_INPUT_NAME: {
-                return isExpirationDateValid(input.value);
-            }
-
-            case CVV_INPUT_NAME: {
-                return !isValueOverMaxLength(input.value, input.maxLength) && !isValueBelowMinLength(input.value, input.minLength);
-            }
-
-            case ZIP_CODE_INPUT_NAME: {
-                return isZipCodeValid(input.value);
-            }
-
-            default: {
-                return false;
-            }
-        }
-    }
-
     export function isValueBelowMinLength(value: string, minLength: number): boolean {
         return value.length < minLength;
     }
@@ -66,5 +35,9 @@ export namespace FormValidators {
         } else {
             return false;
         }
+    }
+
+    export function isCvvValid(value: string): boolean {
+        return !isValueBelowMinLength(value, 3) && !isValueOverMaxLength(value, 4);
     }
 }

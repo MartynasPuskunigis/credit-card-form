@@ -1,6 +1,7 @@
 export interface CreditCardFormDto {
-    creditCardNumberValue: string;
-    expirationDateValue: string;
-    cvvValue: string;
-    zipCodeValue: string;
+    [key: string]: string;
+    creditCardNumber: string;
+    expirationDate: string;
+    cvv: string;
+    zipCode: string;
 }
