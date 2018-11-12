@@ -10,10 +10,11 @@ interface Props {
     value: string;
 }
 
-const cleaveOptions: CleaveOptions = {
+const zipCodeCleaveOptions: CleaveOptions = {
     delimiter: "-",
     blocks: [5, 4],
-    numericOnly: true
+    numericOnly: true,
+
 };
 
 export class ZipCodeInput extends React.Component<Props> {
@@ -37,7 +38,7 @@ export class ZipCodeInput extends React.Component<Props> {
                 onChange={this.onInputValueChange}
                 placeholder="11111"
                 name={this.props.name}
-                options={cleaveOptions}
+                options={zipCodeCleaveOptions}
             />
         );
     }

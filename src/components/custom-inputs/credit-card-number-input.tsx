@@ -10,7 +10,7 @@ interface Props {
     value: string;
 }
 
-const cleaveOptions: CleaveOptions = {
+const creditCardNumberCleaveOptions: CleaveOptions = {
     creditCard: true
 };
 
@@ -35,7 +35,7 @@ export class CreditCardNumberInput extends React.Component<Props> {
                 onChange={this.onInputValueChange}
                 placeholder="1111 1111 1111 1111"
                 name={this.props.name}
-                options={cleaveOptions}
+                options={creditCardNumberCleaveOptions}
             />
         );
     }

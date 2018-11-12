@@ -10,7 +10,7 @@ interface Props {
     value: string;
 }
 
-const cleaveOptions: CleaveOptions = {
+const expirationDateCleaveOptions: CleaveOptions = {
     date: true,
     datePattern: ["m", "y"]
 };
@@ -36,7 +36,7 @@ export class ExpirationDateInput extends React.Component<Props> {
                 onChange={this.onInputValueChange}
                 placeholder="MM/YY"
                 name={this.props.name}
-                options={cleaveOptions}
+                options={expirationDateCleaveOptions}
             />
         );
     }

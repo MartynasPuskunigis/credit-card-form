@@ -13,7 +13,8 @@ import "./credit-card-form.scss";
 type Validation<TFields> = { [TKey in keyof TFields]: boolean };
 
 const zipCodeCleaveOptions: CleaveOptions = {
-    numeral: true
+    numericOnly: true,
+    blocks: [4]
 };
 
 interface FormFields {
@@ -54,8 +55,14 @@ export class CreditCardForm extends React.Component<{}, State> {
         if (!this.state.formInvalid) {
             console.info("Credit card info submitted:", this.state.formFields);
         } else {
-            this.setState({
-                submitClicked: true
+            this.setState(state => {
+                {
+                    const nextState: State = {
+                        ...state,
+                        submitClicked: true
+                    };
+                    return CreditCardForm.calculateState(nextState);
+                }
             });
         }
     };
@@ -72,7 +79,7 @@ export class CreditCardForm extends React.Component<{}, State> {
             formFields: {
                 creditCardNumber: state.formFields.creditCardNumber,
                 expirationDate: state.formFields.expirationDate,
-                cvv: state.formFields.cvv.replace(/[^0-9]/gi, ""),
+                cvv: state.formFields.cvv,
                 zipCode: state.formFields.zipCode
             }
         };
@@ -164,7 +171,7 @@ export class CreditCardForm extends React.Component<{}, State> {
                                     <div className="fas fa-lock form-field-icon" />
                                     <div>CVV</div>
                                 </div>
-                                <input
+                                <Cleave
                                     className="form-input"
                                     type="number"
                                     name={this.getFieldName("cvv")}
@@ -172,6 +179,7 @@ export class CreditCardForm extends React.Component<{}, State> {
                                     maxLength={4}
                                     onChange={this.onInputChange}
                                     value={this.state.formFields.cvv}
+                                    options={zipCodeCleaveOptions}
                                 />
                             </div>
                             <div className="input-field">
@@ -189,7 +197,7 @@ export class CreditCardForm extends React.Component<{}, State> {
                         </div>
                     </div>
                     <div className="buttons">
-                        <input type="submit" value="Pay" />
+                        <input type="submit" value="Pay" disabled={this.state.submitClicked && this.state.formInvalid} />
                     </div>
                     {this.renderErrorList()}
                 </form>
