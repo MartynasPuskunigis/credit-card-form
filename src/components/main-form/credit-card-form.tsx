@@ -171,7 +171,7 @@ export class CreditCardForm extends React.Component<{}, State> {
                                     <div className="fas fa-lock form-field-icon" />
                                     <div>CVV</div>
                                 </div>
-                                <Cleave
+                                <input
                                     className="form-input"
                                     type="number"
                                     name={this.getFieldName("cvv")}
@@ -179,7 +179,6 @@ export class CreditCardForm extends React.Component<{}, State> {
                                     maxLength={4}
                                     onChange={this.onInputChange}
                                     value={this.state.formFields.cvv}
-                                    options={zipCodeCleaveOptions}
                                 />
                             </div>
                             <div className="input-field">

@@ -29,6 +29,7 @@
         "cleave.js": "^1.4.4",
         "react": "^16.4.2",
         "react-dom": "^16.4.2",
+        "react-number-format-presuffix": "^3.3.0",
         "react-router-dom": "^4.3.1",
         "simplr-flux": "^2.3.1"
     }
