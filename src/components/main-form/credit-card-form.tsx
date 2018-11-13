@@ -13,7 +13,7 @@ import "./credit-card-form.scss";
 type Validation<TFields> = { [TKey in keyof TFields]: boolean };
 
 const cvvCleaveOptions: CleaveOptions = {
-    blocks: [3]
+    blocks: [4]
 };
 
 interface FormFields {
