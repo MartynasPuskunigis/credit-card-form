@@ -20,8 +20,4 @@ export namespace FormValidators {
 
         return creditCardNumberRegex.test(value);
     }
-
-    export function cvv(value: string): boolean {
-        return value.length >= 3;
-    }
 }
