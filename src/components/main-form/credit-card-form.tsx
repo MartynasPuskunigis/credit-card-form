@@ -25,14 +25,14 @@ interface FormFields {
 
 interface State {
     formFields: CreditCardFormDto;
-    invalidFields: Validation<CreditCardFormDto>;
+    validFields: Validation<CreditCardFormDto>;
     submitClicked: boolean;
-    formInvalid: boolean;
+    formValid: boolean;
 }
 
 export class CreditCardForm extends React.Component<{}, State> {
     public state: State = {
-        invalidFields: {
+        validFields: {
             creditCardNumber: false,
             cvv: false,
             expirationDate: false,
@@ -45,13 +45,13 @@ export class CreditCardForm extends React.Component<{}, State> {
             zipCode: ""
         },
         submitClicked: false,
-        formInvalid: true
+        formValid: false
     };
 
     private onCreditCardSubmit = (event: React.MouseEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        if (!this.state.formInvalid) {
+        if (this.state.formValid) {
             console.info("Credit card info submitted:", this.state.formFields);
         } else {
             this.setState(state => {
@@ -69,11 +69,11 @@ export class CreditCardForm extends React.Component<{}, State> {
     private static calculateState(state: State): State {
         const nextState: State = {
             ...state,
-            invalidFields: {
-                creditCardNumber: !FormValidators.creditCardNumber(state.formFields.creditCardNumber),
-                expirationDate: !FormValidators.expirationDate(state.formFields.expirationDate),
-                cvv: state.formFields.cvv.length < 3,
-                zipCode: !FormValidators.zipCode(state.formFields.zipCode)
+            validFields: {
+                creditCardNumber: FormValidators.creditCardNumber(state.formFields.creditCardNumber),
+                expirationDate: FormValidators.expirationDate(state.formFields.expirationDate),
+                cvv: state.formFields.cvv.length >= 3,
+                zipCode: FormValidators.zipCode(state.formFields.zipCode)
             },
             formFields: {
                 creditCardNumber: state.formFields.creditCardNumber,
@@ -83,9 +83,9 @@ export class CreditCardForm extends React.Component<{}, State> {
             }
         };
 
-        nextState.formInvalid = Object.keys(nextState.invalidFields)
-            .map(x => nextState.invalidFields[x])
-            .some(x => x);
+        nextState.formValid = Object.keys(nextState.validFields)
+            .map(x => nextState.validFields[x])
+            .every(x => x);
 
         return nextState;
     }
@@ -105,7 +105,7 @@ export class CreditCardForm extends React.Component<{}, State> {
     }
 
     private renderErrorMessage(inputName: keyof FormFields, errorMessage: string): JSX.Element | null {
-        if (this.state.invalidFields[inputName] != null && !this.state.invalidFields[inputName]) {
+        if (this.state.validFields[inputName] != null && this.state.validFields[inputName]) {
             return null;
         }
 
@@ -118,7 +118,7 @@ export class CreditCardForm extends React.Component<{}, State> {
     }
 
     private renderErrorList(): JSX.Element | null {
-        if (!this.state.formInvalid || !this.state.submitClicked) {
+        if (this.state.formValid || !this.state.submitClicked) {
             return null;
         }
 
@@ -196,7 +196,7 @@ export class CreditCardForm extends React.Component<{}, State> {
                         </div>
                     </div>
                     <div className="buttons">
-                        <input type="submit" value="Pay" disabled={this.state.submitClicked && this.state.formInvalid} />
+                        <input type="submit" value="Pay" disabled={this.state.submitClicked && !this.state.formValid} />
                     </div>
                     {this.renderErrorList()}
                 </form>
