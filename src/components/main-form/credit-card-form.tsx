@@ -12,9 +12,8 @@ import "./credit-card-form.scss";
 
 type Validation<TFields> = { [TKey in keyof TFields]: boolean };
 
-const zipCodeCleaveOptions: CleaveOptions = {
-    numericOnly: true,
-    blocks: [4]
+const cvvCleaveOptions: CleaveOptions = {
+    blocks: [3]
 };
 
 interface FormFields {
@@ -71,10 +70,10 @@ export class CreditCardForm extends React.Component<{}, State> {
         const nextState: State = {
             ...state,
             invalidFields: {
-                creditCardNumber: !FormValidators.isCreditCardNumberValid(state.formFields.creditCardNumber),
-                expirationDate: !FormValidators.isExpirationDateValid(state.formFields.expirationDate),
-                cvv: !FormValidators.isCvvValid(state.formFields.cvv),
-                zipCode: !FormValidators.isZipCodeValid(state.formFields.zipCode)
+                creditCardNumber: !FormValidators.creditCardNumber(state.formFields.creditCardNumber),
+                expirationDate: !FormValidators.expirationDate(state.formFields.expirationDate),
+                cvv: !FormValidators.cvv(state.formFields.cvv),
+                zipCode: !FormValidators.zipCode(state.formFields.zipCode)
             },
             formFields: {
                 creditCardNumber: state.formFields.creditCardNumber,
@@ -171,7 +170,7 @@ export class CreditCardForm extends React.Component<{}, State> {
                                     <div className="fas fa-lock form-field-icon" />
                                     <div>CVV</div>
                                 </div>
-                                <input
+                                <Cleave
                                     className="form-input"
                                     type="number"
                                     name={this.getFieldName("cvv")}
@@ -179,6 +178,7 @@ export class CreditCardForm extends React.Component<{}, State> {
                                     maxLength={4}
                                     onChange={this.onInputChange}
                                     value={this.state.formFields.cvv}
+                                    options={cvvCleaveOptions}
                                 />
                             </div>
                             <div className="input-field">
