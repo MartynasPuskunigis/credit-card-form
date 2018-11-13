@@ -72,14 +72,8 @@ export class CreditCardForm extends React.Component<{}, State> {
             validFields: {
                 creditCardNumber: FormValidators.creditCardNumber(state.formFields.creditCardNumber),
                 expirationDate: FormValidators.expirationDate(state.formFields.expirationDate),
-                cvv: state.formFields.cvv.length >= 3,
+                cvv: FormValidators.cvv(state.formFields.cvv),
                 zipCode: FormValidators.zipCode(state.formFields.zipCode)
-            },
-            formFields: {
-                creditCardNumber: state.formFields.creditCardNumber,
-                expirationDate: state.formFields.expirationDate,
-                cvv: state.formFields.cvv,
-                zipCode: state.formFields.zipCode
             }
         };
 
