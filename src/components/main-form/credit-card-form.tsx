@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as Cleave from "cleave.js/react";
 import { CleaveOptions } from "cleave.js/options";
+import classNames from "classnames";
 
 import { ZipCodeInput } from "../custom-inputs/zip-code-input";
 import { ExpirationDateInput } from "../custom-inputs/expiration-date-input";
@@ -10,7 +11,7 @@ import { CreditCardFormDto } from "../../shared/contracts/credit-card-form-dto";
 
 import "./credit-card-form.scss";
 
-type Validation<TFields> = { [TKey in keyof TFields]: boolean };
+type Dictionary<TFields, TValue> = { [TKey in keyof TFields]: TValue };
 
 const cvvCleaveOptions: CleaveOptions = {
     blocks: [4]
@@ -25,7 +26,8 @@ interface FormFields {
 
 interface State {
     formFields: CreditCardFormDto;
-    validFields: Validation<CreditCardFormDto>;
+    validFields: Dictionary<CreditCardFormDto, boolean>;
+    focusedField: string | undefined;
     submitClicked: boolean;
     formValid: boolean;
 }
@@ -44,6 +46,7 @@ export class CreditCardForm extends React.Component<{}, State> {
             expirationDate: "",
             zipCode: ""
         },
+        focusedField: undefined,
         submitClicked: false,
         formValid: false
     };
@@ -64,6 +67,28 @@ export class CreditCardForm extends React.Component<{}, State> {
                 }
             });
         }
+    };
+
+    private onInputFocus = (event: React.FocusEvent<HTMLInputElement>) => {
+        const fieldName = event.currentTarget.name;
+
+        this.setState(state => {
+            const nextState: State = {
+                ...state,
+                focusedField: fieldName
+            };
+            return nextState;
+        });
+    };
+
+    private onInputBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+        this.setState(state => {
+            const nextState: State = {
+                ...state,
+                focusedField: undefined
+            };
+            return nextState;
+        });
     };
 
     private static calculateState(state: State): State {
@@ -136,25 +161,47 @@ export class CreditCardForm extends React.Component<{}, State> {
                             <div className="input-field">
                                 <div className="input-label">
                                     <div className="far fa-credit-card form-field-icon" />
-                                    <div>Card number</div>
+                                    <div
+                                        className={classNames("text", {
+                                            focused: this.state.focusedField === this.getFieldName("creditCardNumber"),
+                                            incorrect: !this.state.validFields.creditCardNumber && this.state.submitClicked
+                                        })}
+                                    >
+                                        Card number
+                                    </div>
                                 </div>
                                 <CreditCardNumberInput
-                                    className="form-input"
+                                    className={classNames("form-input", {
+                                        incorrect: !this.state.validFields.creditCardNumber && this.state.submitClicked
+                                    })}
                                     name={this.getFieldName("creditCardNumber")}
                                     onChange={this.onInputChange}
                                     value={this.state.formFields.creditCardNumber}
+                                    onFocus={this.onInputFocus}
+                                    onBlur={this.onInputBlur}
                                 />
                             </div>
                             <div className="input-field">
                                 <div className="input-label">
                                     <div className="far fa-calendar-alt form-field-icon" />
-                                    <div>Expiration date</div>
+                                    <div
+                                        className={classNames("text", {
+                                            focused: this.state.focusedField === this.getFieldName("expirationDate"),
+                                            incorrect: !this.state.validFields.expirationDate && this.state.submitClicked
+                                        })}
+                                    >
+                                        Expiration date
+                                    </div>
                                 </div>
                                 <ExpirationDateInput
-                                    className="form-input"
+                                    className={classNames("form-input", {
+                                        incorrect: !this.state.validFields.expirationDate && this.state.submitClicked
+                                    })}
                                     name={this.getFieldName("expirationDate")}
                                     onChange={this.onInputChange}
                                     value={this.state.formFields.expirationDate}
+                                    onFocus={this.onInputFocus}
+                                    onBlur={this.onInputBlur}
                                 />
                             </div>
                         </div>
@@ -162,29 +209,52 @@ export class CreditCardForm extends React.Component<{}, State> {
                             <div className="input-field">
                                 <div className="input-label">
                                     <div className="fas fa-lock form-field-icon" />
-                                    <div>CVV</div>
+                                    <div
+                                        className={classNames("text", {
+                                            focused: this.state.focusedField === this.getFieldName("cvv"),
+                                            incorrect: !this.state.validFields.cvv && this.state.submitClicked
+                                        })}
+                                    >
+                                        CVV
+                                    </div>
                                 </div>
                                 <Cleave
-                                    className="form-input"
+                                    className={classNames("form-input", {
+                                        incorrect: !this.state.validFields.cvv && this.state.submitClicked
+                                    })}
                                     type="number"
                                     name={this.getFieldName("cvv")}
                                     placeholder="111"
                                     maxLength={4}
                                     onChange={this.onInputChange}
                                     value={this.state.formFields.cvv}
+                                    onFocus={this.onInputFocus}
+                                    onBlur={this.onInputBlur}
                                     options={cvvCleaveOptions}
+                                    autoComplete="off"
                                 />
                             </div>
                             <div className="input-field">
                                 <div className="input-label">
                                     <div className="fas fa-map-marker-alt form-field-icon" />
-                                    <div>Postal code</div>
+                                    <div
+                                        className={classNames("text", {
+                                            focused: this.state.focusedField === this.getFieldName("zipCode"),
+                                            incorrect: !this.state.validFields.zipCode && this.state.submitClicked
+                                        })}
+                                    >
+                                        Postal code
+                                    </div>
                                 </div>
                                 <ZipCodeInput
-                                    className="form-input"
+                                    className={classNames("form-input", {
+                                        incorrect: !this.state.validFields.zipCode && this.state.submitClicked
+                                    })}
                                     name={this.getFieldName("zipCode")}
                                     onChange={this.onInputChange}
                                     value={this.state.formFields.zipCode}
+                                    onFocus={this.onInputFocus}
+                                    onBlur={this.onInputBlur}
                                 />
                             </div>
                         </div>

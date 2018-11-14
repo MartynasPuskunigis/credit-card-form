@@ -28,11 +28,24 @@
                         .form-field-icon {
                             padding: 0.5rem;
                         }
+
+                        .text {
+                            transition: all 0.2s ease-out;
+
+                            &.focused {
+                                color: #3f51b5;
+                            }
+
+                            &.incorrect {
+                                color: #e91e63;
+                            }
+                        }
                     }
 
                     .form-input {
                         border: none;
                         border-bottom: 1px #dbd9d9 solid;
+                        transition: all 0.2s ease-out;
 
                         &::-webkit-inner-spin-button,
                         &::-webkit-outer-spin-button {
@@ -42,6 +55,10 @@
 
                         &:focus {
                             border-bottom: 1px #3f51b5 solid;
+                        }
+
+                        &.incorrect {
+                            border-bottom: 1px #e91e63 solid;
                         }
                     }
 
